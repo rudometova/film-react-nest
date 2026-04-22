@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-// Схема для расписания (поддокумент)
 @Schema()
 export class Schedule {
   @Prop({ required: true })
@@ -23,10 +22,9 @@ export class Schedule {
   price: number;
 
   @Prop({ type: [String], default: [] })
-  taken: string[];
+  taken: string[]; 
 }
 
-// Схема для фильма
 @Schema()
 export class Film extends Document {
   @Prop({ required: true, unique: true })

@@ -1,4 +1,5 @@
-export class CreateOrderItemDto {
+// DTO для одного билета
+export class TicketDto {
   film: string;
   session: string;
   daytime: string;
@@ -7,4 +8,9 @@ export class CreateOrderItemDto {
   price: number;
 }
 
-export class CreateOrderDto extends Array<CreateOrderItemDto> {}
+// DTO для всего заказа
+export class CreateOrderDto {
+  email: string;
+  phone: string;
+  tickets: TicketDto[];
+}

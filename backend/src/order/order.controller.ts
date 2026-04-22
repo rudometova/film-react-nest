@@ -1,19 +1,18 @@
 import { Controller, Post, Body } from '@nestjs/common';
+import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 
 @Controller('order')
 export class OrderController {
-  
+  constructor(private readonly orderService: OrderService) {}
+
   @Post()
-  createOrder(@Body() orderData: CreateOrderDto) {
-    // Пока просто возвращаем то, что пришло
-    // Позже добавим логику бронирования
+  async createOrder(@Body() orderData: CreateOrderDto) {
+    const items = await this.orderService.createOrder(orderData.tickets);
+    
     return {
-      total: orderData.length,
-      items: orderData.map(item => ({
-        ...item,
-        id: crypto.randomUUID()
-      }))
+      total: items.length,
+      items: items,
     };
   }
 }
