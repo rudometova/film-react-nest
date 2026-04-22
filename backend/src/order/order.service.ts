@@ -1,28 +1,17 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Film } from '../films/schemas/film.schema';
-
-// DTO для одного билета
-export class TicketDto {
-  film: string;
-  session: string;
-  daytime: string;
-  row: number;
-  seat: number;
-  price: number;
-}
+import { Injectable, BadRequestException, Inject } from '@nestjs/common';
+import { FILMS_REPOSITORY } from '../repository/repository.constants';
+import { IFilmsRepository } from '../repository/films.repository.interface';
+import { TicketDto, OrderResponseDto } from './dto/order.dto';
 
 @Injectable()
 export class OrderService {
   constructor(
-    @InjectModel(Film.name) private filmModel: Model<Film>,
+    @Inject(FILMS_REPOSITORY) private readonly filmsRepository: IFilmsRepository,
   ) {}
 
-  async createOrder(orderItems: TicketDto[]) {
-    const results = [];
+  async createOrder(orderItems: TicketDto[]): Promise<OrderResponseDto[]> {
+    const results: OrderResponseDto[] = [];
 
-    // Обрабатываем каждый билет в заказе
     for (const item of orderItems) {
       const result = await this.bookTicket(item);
       results.push(result);
@@ -31,36 +20,28 @@ export class OrderService {
     return results;
   }
 
-  private async bookTicket(item: TicketDto) {
-    // 1. Находим фильм по полю id (строковый ID, не _id)
-    const film = await this.filmModel.findOne({ id: item.film });
+  private async bookTicket(item: TicketDto): Promise<OrderResponseDto> {
+    const film = await this.filmsRepository.findScheduleById(item.film);
     if (!film) {
       throw new BadRequestException(`Фильм с id ${item.film} не найден`);
     }
 
-    // 2. Находим сеанс по полю id
     const schedule = film.schedule.find(s => s.id === item.session);
     if (!schedule) {
       throw new BadRequestException(`Сеанс с id ${item.session} не найден`);
     }
 
-    // 3. Формируем ключ места в формате "ряд:место"
     const seatKey = `${item.row}:${item.seat}`;
 
-    // 4. Проверяем, не занято ли место
     if (schedule.taken.includes(seatKey)) {
       throw new BadRequestException(
         `Место ${item.row}:${item.seat} уже занято. Выберите другое место.`
       );
     }
 
-    // 5. Добавляем место в занятые
     schedule.taken.push(seatKey);
-    
-    // 6. Сохраняем изменения в базе данных
-    await film.save();
+    await this.filmsRepository.updateFilm(film);
 
-    // 7. Возвращаем подтверждение бронирования
     return {
       film: item.film,
       session: item.session,
@@ -68,11 +49,8 @@ export class OrderService {
       row: item.row,
       seat: item.seat,
       price: item.price,
-      id: this.generateId(),
+      id: crypto.randomUUID(),
     };
   }
-
-  private generateId(): string {
-    return crypto.randomUUID();
-  }
 }
+

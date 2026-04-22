@@ -22,7 +22,7 @@ export class Schedule {
   price: number;
 
   @Prop({ type: [String], default: [] })
-  taken: string[]; 
+  taken: string[];
 }
 
 @Schema()
