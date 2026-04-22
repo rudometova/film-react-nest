@@ -1,22 +1,21 @@
 import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';  // ← добавить
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
-import { join } from 'path';  // ← добавить
+import { join } from 'path';
 import 'dotenv/config';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);  // ← добавить тип
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   
-  // Глобальный префикс для всех API эндпоинтов
+  // Глобальный префикс для API
   app.setGlobalPrefix("api/afisha");
   
-  // Разрешаем CORS (для фронтенда на React)
+  // Разрешаем CORS
   app.enableCors();
   
-  // Настройка статических файлов (картинки, стили)
-  // join(__dirname, '..', 'public') - путь к папке public
-  // prefix - URL, по которому будут доступны файлы
-  app.useStaticAssets(join(__dirname, '..', 'public'), {
+  // Статика - указываем правильный путь к папке с картинками
+  // Картинки лежат в public/content/afisha/
+  app.useStaticAssets(join(__dirname, '..', 'public', 'content', 'afisha'), {
     prefix: '/content/afisha/',
   });
   

@@ -1,1 +1,11 @@
-//TODO описать DTO для запросов к /films
+export class FilmResponseDto {
+  id: string;
+  rating: number;
+  director: string;
+  tags: string[];
+  image: string;
+  cover: string;
+  title: string;
+  about: string;
+  description: string;
+}
