@@ -12,8 +12,9 @@ export class Film {
   @Column({ type: 'varchar' })
   director: string;
 
-  @Column({ type: 'text' })
-  tags: string;
+  // Тоже используем simple-array
+  @Column('simple-array')
+  tags: string[];
 
   @Column({ type: 'varchar' })
   image: string;

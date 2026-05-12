@@ -21,8 +21,8 @@ export class Schedule {
   @Column({ type: 'float' })
   price: number;
 
-  @Column({ type: 'text', default: '' })
-  taken: string;
+  @Column('simple-array')
+  taken: string[];
 
   @ManyToOne(() => Film, (film) => film.schedule)
   @JoinColumn({ name: 'filmId' })
