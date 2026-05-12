@@ -7,9 +7,11 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
-  async createOrder(@Body() orderData: CreateOrderDto): Promise<OrdersResponseDto> {
+  async createOrder(
+    @Body() orderData: CreateOrderDto,
+  ): Promise<OrdersResponseDto> {
     const items = await this.orderService.createOrder(orderData.tickets);
-    
+
     return {
       total: items.length,
       items: items,

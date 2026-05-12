@@ -6,7 +6,8 @@ import { TicketDto, OrderResponseDto } from './dto/order.dto';
 @Injectable()
 export class OrderService {
   constructor(
-    @Inject(FILMS_REPOSITORY) private readonly filmsRepository: IFilmsRepository,
+    @Inject(FILMS_REPOSITORY)
+    private readonly filmsRepository: IFilmsRepository,
   ) {}
 
   async createOrder(orderItems: TicketDto[]): Promise<OrderResponseDto[]> {
@@ -26,31 +27,36 @@ export class OrderService {
       throw new BadRequestException(`Фильм с id ${item.film} не найден`);
     }
 
-    const schedule = film.schedule.find(s => s.id === item.session);
+    const schedule = film.schedule.find((s) => s.id === item.session);
     if (!schedule) {
       throw new BadRequestException(`Сеанс с id ${item.session} не найден`);
     }
 
     const seatKey = `${item.row}:${item.seat}`;
 
-    if (schedule.taken.includes(seatKey)) {
+    // Преобразуем строку в массив (для PostgreSQL)
+    const takenSeats =
+      schedule.taken && schedule.taken !== '' ? schedule.taken.split(',') : [];
+
+    if (takenSeats.includes(seatKey)) {
       throw new BadRequestException(
-        `Место ${item.row}:${item.seat} уже занято. Выберите другое место.`
+        `Место ${item.row}:${item.seat} уже занято. Выберите другое место.`,
       );
     }
 
-    schedule.taken.push(seatKey);
+    takenSeats.push(seatKey);
+    schedule.taken = takenSeats.join(',');
+
     await this.filmsRepository.updateFilm(film);
 
     return {
       film: item.film,
       session: item.session,
-      daytime: item.daytime,
+      daytime: schedule.daytime,
       row: item.row,
       seat: item.seat,
-      price: item.price,
+      price: schedule.price,
       id: crypto.randomUUID(),
     };
   }
 }
-
