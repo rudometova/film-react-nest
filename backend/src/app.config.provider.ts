@@ -1,14 +1,20 @@
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 export const configProvider = {
-  imports: [ConfigModule.forRoot()],
+  imports: [ConfigModule],
   provide: 'CONFIG',
-  useValue: {
+  useFactory: (configService: ConfigService) => ({
     database: {
-      driver: process.env.DATABASE_DRIVER || 'mongodb',
-      url: process.env.DATABASE_URL || 'mongodb://localhost:27017/practicum',
+      driver: configService.get<string>('DATABASE_DRIVER', 'postgres'),
+      url: configService.get<string>('DATABASE_URL', 'postgresql://localhost:5432/prac'),
+      host: configService.get<string>('DATABASE_HOST', 'localhost'),
+      port: configService.get<number>('DATABASE_PORT', 5432),
+      name: configService.get<string>('DATABASE_NAME', 'prac'),
+      username: configService.get<string>('DATABASE_USERNAME', 'postgres'),
+      password: configService.get<string>('DATABASE_PASSWORD', ''),
     },
-  } as AppConfig,
+  }),
+  inject: [ConfigService],
 };
 
 export interface AppConfig {
@@ -18,4 +24,9 @@ export interface AppConfig {
 export interface AppConfigDatabase {
   driver: string;
   url: string;
+  host: string;
+  port: number;
+  name: string;
+  username: string;
+  password: string;
 }

@@ -45,12 +45,11 @@ export class OrderService {
     return {
       film: item.film,
       session: item.session,
-      daytime: item.daytime,
+      daytime: schedule.daytime,
       row: item.row,
       seat: item.seat,
-      price: item.price,
+      price: schedule.price,
       id: crypto.randomUUID(),
     };
   }
 }
-
