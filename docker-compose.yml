@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: film-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: sunrestM3
+      POSTGRES_DB: prac
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - film-network
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    container_name: film-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env.docker
+    ports:
+      - "3000:3000"
+    networks:
+      - film-network
+    depends_on:
+      - postgres
+
+  frontend:
+    build: ./frontend
+    container_name: film-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    networks:
+      - film-network
+    depends_on:
+      - backend
+
+networks:
+  film-network:
+    driver: bridge
+
+volumes:
+  postgres-data:

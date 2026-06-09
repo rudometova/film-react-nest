@@ -1,5 +1,7 @@
 # FILM!
 
+**Деплой:** https://rudometova.nomorepartiessite.ru
+
 ## Установка
 
 ### MongoDB
