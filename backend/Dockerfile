@@ -6,9 +6,6 @@ WORKDIR /app
 # Копируем package.json и package-lock.json
 COPY package*.json ./
 
-# Копируем .env 
-COPY .env .env
-
 # Устанавливаем все зависимости (включая dev)
 RUN npm ci
 
@@ -25,9 +22,6 @@ WORKDIR /app
 
 # Копируем package.json
 COPY package*.json ./
-
-# Копируем .env в продакшен
-COPY .env .env
 
 # Устанавливаем только production зависимости
 RUN npm ci --omit=dev
